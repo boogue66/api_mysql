@@ -16,11 +16,11 @@ app.get('/api', (req, res) => {
   res.json({
     message: 'Bienvenido a la API de productos y usuarios.',
     instrucciones: {
-      seed: {
+     /*  seed: {
         descripcion: 'Rellena la base de datos con datos de prueba (usuarios y productos).',
         metodo: 'POST',
-        ruta: '/api/seed',
-      },
+        ruta: '/api/populate',
+      }, */
       auth: {
         registro: {
           metodo: 'POST',
