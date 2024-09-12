@@ -1,37 +1,86 @@
-// models/User.js
 const db = require('../config/db'); // Ajusta la ruta según sea necesario
 
 class User {
-  static async findByEmail(email) {
-    console.log('Buscando usuario por email:', email);
-    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    console.log('Resultado de la búsqueda:', rows);
-    return rows[0];
-  }
-
-  static async create(name, email, password, role) {
-    console.log('Creando usuario:', { name, email, role });
-    await db.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [name, email, password, role]);
-  }
-
-  static async update(id, name, email, password, role) {
-    let query = 'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?';
-    const values = [name, email, role, id];
-    
-    if (password) {
-      query = 'UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?';
-      values.splice(2, 0, password);
+  
+  static async count() {
+    try {
+      const [rows] = await db.query('SELECT COUNT(*) AS count FROM users');
+      return rows[0].count;
+    } catch (error) {
+      console.error('Error al contar usuarios:', error);
+      throw new Error('Error al contar usuarios');
     }
-
-    console.log('Actualizando usuario con datos:', { id, name, email, password, role });
-    await db.query(query, values);
   }
 
-  static async delete(id) {
-    console.log('Eliminando usuario con ID:', id);
-    await db.query('DELETE FROM users WHERE id = ?', [id]);
+  static async createTable() {
+    const query = `
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL,
+        first_name VARCHAR(255),
+        last_name VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `;
+    await db.query(query);
+  }
+  // Encontrar un usuario por email
+  static async findByEmail(email) {
+    try {
+      const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+      return rows[0];
+    } catch (error) {
+      console.error('Error al buscar usuario por email:', error);
+      throw new Error('Error al buscar usuario');
+    }
+  }
+
+ // Crear un nuevo usuario
+static async create(username, email, password, first_name, last_name, role) {
+  try {
+    await db.query(
+      'INSERT INTO users (username, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)', 
+      [username, email, password, role, first_name, last_name]
+    );
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+    throw new Error('Error al crear usuario');
   }
 }
 
+
+  // Actualizar usuario
+  static async update(id, username, email, password, role, first_name, last_name) {
+    try {
+      let query = 'UPDATE users SET username = ?, email = ?, role = ?, first_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+      const values = [username, email, role, first_name, last_name, id];
+      
+      // Si la contraseña es proporcionada, se actualiza también
+      if (password_hash) {
+        query = 'UPDATE users SET username = ?, email = ?, password = ?, role = ?, first_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+        values.splice(2, 0, password); // Insertar password_hash en el lugar correcto
+      }
+
+      await db.query(query, values);
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      throw new Error('Error al actualizar usuario');
+    }
+  }
+
+  // Eliminar un usuario
+  static async delete(id) {
+    try {
+      await db.query('DELETE FROM users WHERE id = ?', [id]);
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      throw new Error('Error al eliminar usuario');
+    }
+  }
+}
 
 module.exports = User;

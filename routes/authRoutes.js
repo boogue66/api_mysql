@@ -1,11 +1,12 @@
+
 const express = require('express');
-const { register, login,updateUser,deleteUser } = require('../controllers/authController');
 const router = express.Router();
+const userController = require('../controllers/authController.js');
+router.post('/register', userController.register); // Registro de nuevo usuario
+router.post('/login', userController.login);       // Login de usuario
 
-
-router.post('/register', register);
-router.post('/login', login);
-router.put('/users/:id', updateUser); 
-router.delete('/users/:id', deleteUser); 
+// Rutas protegidas para CRUD de usuarios
+router.put('/users/:id', userController.updateUser);   // Actualizar usuario
+router.delete('/users/:id', userController.deleteUser); // Eliminar usuario
 
 module.exports = router;
