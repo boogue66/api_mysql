@@ -55,6 +55,29 @@ exports.login = async (req, res) => {
   }
 };
 
+// Obtener información del usuario logueado
+exports.userInfo = async (req, res) => {
+  const { userId } = req; // Obtiene el ID del usuario del middleware
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      role: user.role
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Actualizar Usuario
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
@@ -63,7 +86,6 @@ exports.updateUser = async (req, res) => {
   try {
     // Si se proporciona una nueva contraseña, hashearla
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-    
     // Actualizar el usuario con los nuevos datos
     await User.update(id, username, email, hashedPassword, first_name, last_name, role);
     res.json({ message: 'Usuario actualizado con éxito' });
