@@ -29,6 +29,15 @@ class User {
     await db.query(query);
   }
   // Encontrar un usuario por email
+  static async findById (id) {
+    try {
+      const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [email]);
+      return rows[0];
+    } catch (error) {
+      console.error('Error al buscar usuario por email:', error);
+      throw new Error('Error al buscar usuario');
+    }
+  }
   static async findByEmail(email) {
     try {
       const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
