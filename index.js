@@ -32,6 +32,11 @@ app.get('/api', (req, res) => {
           ruta: '/api/auth/login',
           descripcion: 'Inicia sesión y recibe un token JWT.',
         },
+        user_info: {
+          metodo: 'POST',
+          ruta: '/api/auth/user-info',
+          descripcion: 'Muestra informacion usuario logueado con un token JWT.',
+        }
       },
       productos: {
         crear: {
